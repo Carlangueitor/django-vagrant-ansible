@@ -1,18 +1,24 @@
 ---
 - hosts: all
+  become: yes
   vars:
     python_version: 3.4
     root_dir: /home/vagrant/myproject
+    postgresql_databases:
+      - name: todo
+  roles:
+  - { role: ANXS.postgresql }
   tasks:
   - name: Ensure Python is installed
     apt: name=python{{ python_version }} state=present
-    become: yes
   - name: Ensure Python setuptools are installed
     apt: name=python3-setuptools state=latest
-    become: yes
   - name: Ensure pip is installed
     easy_install: name=pip state=latest executable=easy_install3
-    become: yes
+  - name: Ensure devel libraries are installed
+    apt: name={{ item }} state=latest
+    with_items:
+      - libpq-dev
+      - libpython3-dev
   - name: Install Python Packages
     pip: requirements={{ root_dir }}/requirements.txt
-    become: yes
