@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from todo.views import home, done
 
 urlpatterns = [
+    url(r'^$', home),
+    url(r'^tasks/(?P<pk>[0-9]+)/done$', done),
     url(r'^admin/', admin.site.urls),
 ]

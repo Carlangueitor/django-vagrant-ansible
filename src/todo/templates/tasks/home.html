@@ -1,0 +1,28 @@
+<!doctype>
+<html>
+  <head>
+    <title>TODO</title>
+    {% load staticfiles %}
+    <link href='https://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{% static 'tasks/styles.css' %}" />
+  </head>
+  <body>
+    <div id="main-container">
+      <h1>TODO List</h1>
+      <ul id="main-list">
+        {% for task in tasks %}
+        <li class="task-done-{{ task.done | lower }}">
+	  <span class="task-name">{{ task.name }}</span><br />
+          <span class="task-date">{{ task.date_created }}</span>
+          {% if not task.done %}
+          <form class="task-action-done" action="/tasks/{{ task.pk}}/done" method="POST">
+            {% csrf_token %} 
+            <input type="submit" class="task-action-done-button" value="Done"/>
+          </form>
+          {% endif %}
+        </li> 
+        {% endfor %}
+      </ul>
+    </div>
+  </body>
+</html>
