@@ -1,4 +1,5 @@
 # Ansible Demo
+This a simple deme presented in *Chilango Django* Meetup.
 
 ## Prerequisites
 
@@ -13,3 +14,10 @@ Make sure prerequisites are installed before run these steps:
 
 * Install Ansible Roles with `ansible-galaxy install -r requirements.txt`
 * Create Vagrant machine: `vagrant up`
+
+To run the provider use `vagrant provision
+
+## Runing the remote example
+
+* Edit `inventory.cfg` with your server details.
+* Run `ansible-playbook playbook.yml -i inventory.cfg -l prod -k -u <REMOTE_USER>`
