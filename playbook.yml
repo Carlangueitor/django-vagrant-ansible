@@ -3,22 +3,54 @@
   become: yes
   vars:
     python_version: 3.4
-    root_dir: /home/vagrant/myproject
     postgresql_databases:
       - name: todo
   roles:
   - { role: ANXS.postgresql }
+  
   tasks:
   - name: Ensure Python is installed
     apt: name=python{{ python_version }} state=present
+
   - name: Ensure Python setuptools are installed
     apt: name=python3-setuptools state=latest
+
   - name: Ensure pip is installed
     easy_install: name=pip state=latest executable=easy_install3
-  - name: Ensure devel libraries are installed
+
+  - name: Ensure devel libraries and tools are installed
     apt: name={{ item }} state=latest
     with_items:
       - libpq-dev
       - libpython3-dev
+      - git
+
+  - name: Ensure GIT repository is updated
+    git: repo=https://github.com/Carlangueitor/django-vagrant-ansible.git
+         dest={{ root_dir }}
+         accept_hostkey=yes
+    when: env == "prod"
+
   - name: Install Python Packages
     pip: requirements={{ root_dir }}/requirements.txt
+
+  - name: Install Server requirements
+    apt: name={{ item }} state=present
+    with_items:
+      - nginx
+      - uwsgi
+      - uwsgi-plugin-python
+    when: env == "prod"
+
+  - name: Ensure wWSGI config is updated
+    copy: src=conf/uwsgi-todo.ini dest=/etc/uwsgi/apps-enabled/
+    when: env == "prod"
+    notify: Reload uWSGI
+
+  - name: Ensure NGIX config is updated
+    copy: src=conf/todo.conf dest=/etc/nginx/sites-enabled/
+    when: env == "prod"
+    notify: Reload NGINX
+
+  - name: Reload NGINX
+    service: name=nginx state=reloaded
